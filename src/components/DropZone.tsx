@@ -5,8 +5,25 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 
-const DropZone = ({ status, children, updateTaskStatus, className }) => {
-  const [, drop] = useDrop({
+interface DropZoneProps {
+  status: string;
+  children: React.ReactNode;
+  updateTaskStatus: (id: number, status: string) => void;
+  className?: string;
+}
+
+interface DraggedItem {
+  id: number;
+  status: string;
+}
+
+const DropZone = ({
+  status,
+  children,
+  updateTaskStatus,
+  className,
+}: DropZoneProps): JSX.Element => {
+  const [, drop] = useDrop<DraggedItem>({
     accept: 'TASK',
     drop: (draggedItem) => {
       if (draggedItem.status !== status) {
@@ -15,7 +32,7 @@ const DropZone = ({ status, children, updateTaskStatus, className }) => {
     },
   });
 
-  const color = (status) => {
+  const color = (status: string): string => {
     switch (status) {
       case 'Queue':
         return 'lightblue';
@@ -23,12 +40,14 @@ const DropZone = ({ status, children, updateTaskStatus, className }) => {
         return 'lightgreen';
       case 'Done':
         return 'lightcoral';
+      default:
+        return 'white';
     }
   };
 
   return (
     <Box
-      ref={drop}
+      ref={drop as React.Ref<HTMLDivElement>}
       sx={{
         padding: 2,
         border: '1px solid grey',
@@ -42,11 +61,13 @@ const DropZone = ({ status, children, updateTaskStatus, className }) => {
         {status}
       </Typography>
       <List>
-        {React.Children.map(children, (child, index) => (
-          <ListItem key={index} disablePadding>
-            {child}
-          </ListItem>
-        ))}
+        {React.Children.map(children, (child, index) =>
+          React.isValidElement(child) ? (
+            <ListItem key={index} disablePadding>
+              {child}
+            </ListItem>
+          ) : null
+        )}
       </List>
     </Box>
   );

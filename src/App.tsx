@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { Route, Routes, useLocation, Link } from 'react-router-dom';
 import ProjectBorder from './pages/ProjectBorder';
 import TaskList from './pages/TaskList';
@@ -7,35 +6,40 @@ import Home from './pages/Home';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
-
-import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
-
+import { RootState } from './redux/store';
+import { Task } from './types/taskTypes';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
 import MenuIcon from '@mui/icons-material/Menu';
 import Search from './components/Search';
 
 function App() {
   const location = useLocation();
-  const projectTitle =
+
+  const projectTitle: string =
     location.pathname.startsWith('/projects/') &&
     location.pathname !== '/projects'
       ? decodeURIComponent(location.pathname.split('/projects/')[1])
       : 'TODO';
 
-  const tasks = useSelector((state) => state.taskList.tasks || []);
+  const tasks = useSelector((state: RootState) => state.taskList.tasks || []);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredTasks, setFilteredTasks] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  const shouldShowSearch =
+  const shouldShowSearch: boolean =
     location.pathname === '/projects' ||
     location.pathname.startsWith('/projects');
 
-  const shouldShowList =
+  const shouldShowList: boolean =
     location.pathname.startsWith('/projects') &&
     location.pathname !== '/projects';
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: string): void => {
     const result = tasks.filter(
       (task) =>
         task.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -45,11 +49,18 @@ function App() {
     setIsSearching(true);
   };
 
-  const resetSearch = () => {
+  const resetSearch = (): void => {
     setFilteredTasks([]);
     setIsSearching(false);
     setSearchQuery('');
   };
+
+  const updateTaskStatus = (id: number, status: string): void => {
+    // Добавьте логику обновления статуса задачи.
+    console.log(`Task with ID ${id} updated to status ${status}`);
+  };
+
+
 
   return (
     <>
@@ -94,6 +105,7 @@ function App() {
             path='/projects/:title'
             element={
               <TaskList
+
                 searchQuery={searchQuery}
                 isSearching={isSearching}
                 filteredTasks={filteredTasks}

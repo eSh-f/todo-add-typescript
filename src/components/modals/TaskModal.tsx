@@ -9,6 +9,8 @@ import {
   MenuItem,
 } from '@mui/material';
 
+import { TaskModalProps } from '../../types/taskModalProps';
+
 const TaskModal = ({
   isModalOpen,
   closeModal,
@@ -22,8 +24,8 @@ const TaskModal = ({
   editingTask,
   deadLineDate,
   setDeadLineDate,
-}) => {
-  const handleSave = () => {
+}: TaskModalProps) => {
+  const handleSave = (): void => {
     handleAddOrUpdateTask();
     closeModal();
   };
@@ -63,7 +65,7 @@ const TaskModal = ({
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Typography sx={{ fontWeght: 'bold', mb: 1 }}>Приоритет:</Typography>
+          <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Приоритет:</Typography>
           <TextField
             select
             fullWidth
@@ -89,7 +91,7 @@ const TaskModal = ({
           >
             <ReactQuill
               value={description}
-              onChange={setDescription}
+              onChange={(value: string) => setDescription(value)}
               placeholder='Введите описание'
             />
           </Box>

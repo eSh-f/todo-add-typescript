@@ -1,9 +1,22 @@
 import { TextField } from '@mui/material';
 import React, { useState } from 'react';
+
 import { Box } from '@mui/material';
 
-const Search = ({ searchQuery, onSearch, setSearchQuery, resetSearch }) => {
-  const handleInputChange = (e) => {
+interface SearchProps {
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  setSearchQuery: (value: string) => void;
+  resetSearch: () => void;
+}
+
+const Search = ({
+  searchQuery,
+  onSearch,
+  setSearchQuery,
+  resetSearch,
+}: SearchProps): JSX.Element => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value;
     setSearchQuery(value);
 
@@ -12,12 +25,12 @@ const Search = ({ searchQuery, onSearch, setSearchQuery, resetSearch }) => {
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = (): void => {
     if (!searchQuery.trim()) {
       resetSearch();
       return;
     }
-    onSearch(searchQuery);
+    onSearch(searchQuery.trim());
   };
 
   return (

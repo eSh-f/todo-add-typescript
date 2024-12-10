@@ -5,11 +5,17 @@ import App from './App';
 import { HashRouter } from 'react-router-dom';
 import { store } from './redux/store';
 import { Provider } from 'react-redux';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import theme from './theme';
 import 'react-quill/dist/quill.snow.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+const root = ReactDOM.createRoot(rootElement);
+
 root.render(
   <ThemeProvider theme={theme}>
     <Provider store={store}>

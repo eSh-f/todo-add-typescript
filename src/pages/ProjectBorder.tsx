@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { RootState } from '@/redux/store';
 
 import {
   IconButton,
@@ -20,17 +21,19 @@ import {
 } from '@mui/material';
 
 const ProjectBorder = () => {
-  const [projectTitle, setPtojectTitle] = useState('');
-  const [addProjectButton, setAddProjectButton] = useState(false);
+  const [projectTitle, setPtojectTitle] = useState<string>('');
+  const [addProjectButton, setAddProjectButton] = useState<boolean>(false);
 
-  const projects = useSelector((state) => state.projectList.projects);
+  const projects = useSelector(
+    (state: RootState) => state.projectList.projects
+  );
   const dispatch = useDispatch();
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setPtojectTitle(e.target.value);
   };
 
-  const handlAddProject = () => {
+  const handlAddProject = (): void => {
     if (projectTitle.trim() === '') return;
     dispatch(addTodoProject({ title: projectTitle }));
     setPtojectTitle('');

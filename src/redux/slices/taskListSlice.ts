@@ -1,11 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
+import { Task, TaskListState, Comment } from '../../types/taskTypes';
 
-const initialState = {
+const initialState: TaskListState = {
   tasks: [],
 };
 
-const findComment = (comments, id) => {
+const findComment = (comments: Comment[], id: number): Comment | null => {
   for (const comment of comments) {
     if (comment.id === id) return comment;
     if (comment.replies) {
@@ -20,7 +21,17 @@ const taskList = createSlice({
   name: 'task',
   initialState,
   reducers: {
-    addTasks: (state, action) => {
+    addTasks: (
+      state,
+      action: PayloadAction<{
+        status: string;
+        title: string;
+        description?: string;
+        priority: string;
+        projectId: number;
+        deadLineDate: string;
+      }>
+    ) => {
       state.tasks.push({
         status: action.payload.status,
         id: Date.now(),
@@ -38,42 +49,54 @@ const taskList = createSlice({
         comments: [],
       });
     },
-    toggleTaskCompletion: (state, action) => {
+    toggleTaskCompletion: (state, action: PayloadAction<number>) => {
       const task = state.tasks.find((task) => task.id === action.payload);
       if (task) {
         task.completed = !task.completed;
         task.status = 'Done';
       }
     },
-    deleteTask: (state, action) => {
+    deleteTask: (state, action: PayloadAction<number>) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
-    updateTaskStatus: (state, action) => {
+    updateTaskStatus: (
+      state,
+      action: PayloadAction<{ id: number; status: string }>
+    ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         task.status = action.payload.status;
         task.completed = action.payload.status === 'Done';
       }
     },
-    updateTaskTitle: (state, action) => {
+    updateTaskTitle: (
+      state,
+      action: PayloadAction<{ id: number; title: string }>
+    ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         task.title = action.payload.title;
       }
     },
-    updateTaskDiscription: (state, action) => {
+    updateTaskDiscription: (
+      state,
+      action: PayloadAction<{ id: number; description: string }>
+    ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         task.description = action.payload.description;
       }
     },
-    updatePriority: (state, action) => {
+    updatePriority: (
+      state,
+      action: PayloadAction<{ id: number; priority: string }>
+    ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         task.priority = action.payload.priority;
       }
     },
-    startTask: (state, action) => {
+    startTask: (state, action: PayloadAction<{ id: number }>) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         if (task.isActive) {
@@ -82,18 +105,24 @@ const taskList = createSlice({
           task.startTime = null;
           task.isActive = false;
         } else {
-          task.startTime = dayjs().toISOString();
+          task.startTime = dayjs().valueOf();
           task.isActive = true;
         }
       }
     },
-    updateDeadLineDate: (state, action) => {
+    updateDeadLineDate: (
+      state,
+      action: PayloadAction<{ id: number; deadLineDate: string }>
+    ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
       if (task) {
         task.deadLineDate = action.payload.deadLineDate;
       }
     },
-    addSubtask: (state, action) => {
+    addSubtask: (
+      state,
+      action: PayloadAction<{ taskId: number; title: string }>
+    ) => {
       const task = state.tasks.find(
         (task) => task.id === action.payload.taskId
       );
@@ -106,7 +135,10 @@ const taskList = createSlice({
         task.subTasks.push(newSubtask);
       }
     },
-    deleteSubTask: (state, action) => {
+    deleteSubTask: (
+      state,
+      action: PayloadAction<{ taskId: number; subTaskId: number }>
+    ) => {
       const task = state.tasks.find(
         (task) => task.id === action.payload.taskId
       );
@@ -116,7 +148,10 @@ const taskList = createSlice({
         );
       }
     },
-    toggleSubtaskCompletion: (state, action) => {
+    toggleSubtaskCompletion: (
+      state,
+      action: PayloadAction<{ taskId: number; subTaskId: number }>
+    ) => {
       const task = state.tasks.find(
         (task) => task.id === action.payload.taskId
       );
@@ -129,18 +164,28 @@ const taskList = createSlice({
         }
       }
     },
-    addComment: (state, action) => {
+    addComment: (
+      state,
+      action: PayloadAction<{
+        taskId: number;
+        parentId: number | null;
+        content: string;
+      }>
+    ) => {
       const { taskId, parentId, content } = action.payload;
       const task = state.tasks.find((task) => task.id === taskId);
       if (task) {
-        const newComment = {
+        const newComment: Comment = {
           id: Date.now(),
           content,
-          replies: [],
+          replies: [] as Comment[],
         };
-        if (parentId) {
+        if (parentId !== null) {
           const parentComment = findComment(task.comments, parentId);
           if (parentComment) {
+            if (!parentComment.replies) {
+              parentComment.replies = [];
+            }
             parentComment.replies.push(newComment);
           }
         } else {
